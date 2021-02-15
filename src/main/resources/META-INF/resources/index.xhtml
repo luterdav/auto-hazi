@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core" xml:lang="en" lang="en"
+      xmlns:p="http://primefaces.org/ui">
+<h:head>
+    <title>JSF Weboldalunk</title>
+</h:head>
+<h:body>
+    <h1>Autó karbantartó alkamazásunk</h1>
+    <h:form>
+        <p:messages />
+        <p:panelGrid columns="2">
+            <p:outputLabel value="Típus"/>
+            <p:selectOneMenu id="carType" value="#{carManagerMBean.selectedCar.carType}"
+                             converter="#{carTypeConverter}">
+                <f:selectItems value="#{carManagerMBean.carTypeList}" var="carType" itemLabel="#{carType.name}"
+                               itemValue="#{carType}"/>
+            </p:selectOneMenu>
+            <p:outputLabel value="Gyártó"/>
+            <p:selectOneMenu id="carManufacturer" value="#{carManagerMBean.selectedCar.carManufacturer}"
+                             converter="#{carManufacturerConverter}">
+                <f:selectItems value="#{carManagerMBean.carManufacturerList}" var="carManufacturer" itemLabel="#{carManufacturer.name}"
+                              itemValue="#{carManufacturer}"/>
+            </p:selectOneMenu>
+            <p:outputLabel value="Ajtók száma"/>
+            <p:inputText value="#{carManagerMBean.selectedCar.numberOfDoors}"/>
+            <p:outputLabel value="Gyártási év"/>
+            <p:inputText value="#{carManagerMBean.selectedCar.yearOfManufacture}"/>
+            <p:commandButton validateClient="true" value="Mentés" actionListener="#{carManagerMBean.save}" update="@form"/>
+        </p:panelGrid>
+
+        <p:dataTable id="carTable" value="#{carManagerMBean.carList}" var="car" rows="10"
+                     paginator="true"
+                     paginatorTemplate="{CurrentPageReport} {Exporters} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                     rowsPerPageTemplate="5,10,15">
+            <f:facet name="{Exporters}">
+                <h:commandLink>
+                    XLS
+                    <p:dataExporter type="xls" target="carTable" fileName="cars"/>
+                </h:commandLink>
+
+                <h:commandLink>
+                    PDF
+                    <p:dataExporter type="pdf" target="carTable" fileName="cars"/>
+                </h:commandLink>
+
+                <h:commandLink>
+                    XML
+                    <p:dataExporter type="xml" target="carTable" fileName="cars"/>
+                </h:commandLink>
+            </f:facet>
+
+            <p:column headerText="Autó típusa" sortBy="#{car.carType}" filterBy="#{car.carType}"
+                      filterMatchMode="contains">
+                <h:outputText value="#{car.carType}" converter="#{carTypeConverter}" /> <!--added weapon converter-->
+            </p:column>
+            <p:column headerText="Autó gyártója" sortBy="#{car.carManufacturer}" filterBy="#{car.carManufacturer}"
+                      filterMatchMode="contains">
+                <h:outputText value="#{car.carManufacturer}" converter="#{carManufacturerConverter}" /> <!--added weapon converter-->
+            </p:column>
+
+            <p:column headerText="Ajtók száma" sortBy="#{car.numberOfDoors}" filterBy="#{car.numberOfDoors}"
+                      filterMatchMode="contains">
+                <h:outputText value="#{car.numberOfDoors}"/>
+            </p:column>
+            <p:column headerText="Gyártás éve" sortBy="#{car.yearOfManufacture}" filterBy="#{car.yearOfManufacture}"
+                      filterMatchMode="contains">
+                <h:outputText value="#{car.yearOfManufacture}"/>
+            </p:column>
+
+            <p:column headerText="Létrehozás dátuma" sortBy="#{car.createdDate}" filterBy="#{car.createdDate}"
+                      filterMatchMode="contains">
+                <h:outputText value="#{car.createdDate}">
+                    <f:convertDateTime pattern="yyyy-MM-dd"/>
+                </h:outputText>
+            </p:column>
+            <p:column headerText="Módosítás dátuma" sortBy="#{car.lastModifiedDate}"
+                      filterBy="#{car.lastModifiedDate}"
+                      filterMatchMode="contains">
+                <h:outputText value="#{car.lastModifiedDate}">
+                    <f:convertDateTime pattern="yyyy-MM-dd"/>
+                </h:outputText>
+            </p:column>
+            <p:column headerText="Funkciók">
+                <p:commandButton value="Törlés" process="@this" actionListener="#{carManagerMBean.delete(car.id)}" update="@form"/>
+                <p:commandButton value="Módosítás" process="@this" actionListener="#{carManagerMBean.selectOne(car)}"
+                                 update="@form"/>
+
+            </p:column>
+        </p:dataTable>
+    </h:form>
+</h:body>
+</html>
